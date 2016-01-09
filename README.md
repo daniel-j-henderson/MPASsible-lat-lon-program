@@ -15,6 +15,8 @@ Just run the program to create the new interpolated netCDF file and then view it
                     plot, like surface_pressure or qv. It should correspond to the Info file. If all info and data
                     can be found in the same file, then only one of these entries is required.
 
+**SPATIAL DIMENSION** - This refers to the dimensions nCells, nEdges, and nVertices. Without one of these, there is nothing to interpolate.
+
 ##HOW TO BUILD
 Just make the makefile and you'll be fine
 
@@ -25,10 +27,21 @@ Just make the makefile and you'll be fine
     will be distortion around the poles.
   - you may specify 1 or 2 input files containing your desired MPAS variables*
   - you may specify the name of the output file*
-  - you may specify the name of the desired MPAS variables*
+  - you may specify the name of the desired MPAS variables (up to 20)*
+
   *can also be done from the command line
 2. Supply optional command arguments to the executable "interp"
   - use **-v var1 var2 var3 ...** to add variables from the command line
   - use **-i filename** to supply the meshInfoFile from the command line
   - use **-d filename** to supply the meshDataFile from the command line
   - use **-o filename** to redirect the output file from the command line
+##REQUIREMENTS
+  - This version supports up to 20 variables.
+  - This version supports 6 MPAS dimensions: nCells, nVertices, nEdges, Time, nVertLevels, nSoilLevels.
+  - MPAS syntax must be used in all input files. 
+  - The each variable must be dimensioned at least by one and only one spatial dimension. 
+
+##NOTES
+  - For large meshes with large, multidimensional variables, the data for one variable at every time/vertical level may be too large to hold in memory, so these variables will be tackled in slices, one slice per (time)(vertlevel). 
+  - The execution time generally scales more drastically with grid size than mesh size, so for optimal speed (on the order of a few seconds or less), choose a coarser grid (your monitor is only so large anyways). 
+  - That being said, a mesh with over 65 million cells does take around 15 seconds to import all the mesh info into memory, so expect some overhead for very fine meshes.
