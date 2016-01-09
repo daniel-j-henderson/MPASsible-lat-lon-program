@@ -1,0 +1,25 @@
+&interpolator_settings
+	Variables = ' ' !Desired variables to interpolate. Up to 20.
+	
+	!Mesh Info File :: This file contains all the mesh information, like CellsOnCell or xCell and such, needed for the program.
+	!If all Info and Data can be found in the same file, put one of these fields as the filename, the other as a ' '.
+	
+	meshInfoFile = '/glade/scratch/duda/daniel/3km/init_2012.nc' 
+	
+	
+	!Mesh Data File :: This file contains all the mesh data for every field you wish to interpolate. It should have the same size/characteristics
+	!of the Info file, but need not contain mesh metadata like cell coordinates and such things.
+	!If all Info and Data can be found in the same file, put one of these fields as the filename, the other as a ' '.
+	
+	meshDataFile = '/glade/scratch/duda/daniel/3km/diag.2012-10-28_00.00.00.nc'
+	
+	
+	outputfile = 'myNewFile.nc' !Whatever you'd like to call the output file
+	
+	gridW = 200 !Number of E/W gridpoints
+	gridH = 100 !Number of N/S gridpoints
+	gridHmin = -90.0 !Minimum of range of latitude
+	gridHmax = 90.0 !Maximum of range of latitude
+	gridWmin = 0.0 !Minimum of range of longitude
+	gridWmax = 360.0 !Maximum of range of longitude
+/
