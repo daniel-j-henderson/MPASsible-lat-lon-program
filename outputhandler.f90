@@ -332,9 +332,8 @@ module outputhandler
 			real, dimension(:,:,:), allocatable :: putData
 			real, dimension(:,:), allocatable :: meshData
 			logical :: tooBig = .false., left = .false.
-     	    integer(kind=8) :: bigness, x, y
-     	    integer, dimension(2) :: dimensionSizes
-                        real(kind=8) :: start, finish, startB, startC, finishB, finishC     
+     	    		integer(kind=8) :: bigness, x, y
+     	    		integer, dimension(2) :: dimensionSizes
      	    
      	    
 			if ((varDimIDs(1) == nCellsID) .or. (varDimIDs(2) == nCellsID)) then
@@ -422,15 +421,11 @@ module outputhandler
 			else
 				dimensionSizes = (/spatialDimSize, otherDim/)
 			end if
-                        write (*,*) 'spatialDimSize', spatialDimSize
-                        write (*,*) 'otherDim', otherDim
                         x = spatialDimSize
                         y = otherDim
                         bigness = x*y
-                        write (*,*) 'The bigness is :', bigness                    
 			if (bigness > 800000000) then
 				tooBig = .true.
-                                write (*,*) 'tooBig is:', tooBig
 				if (.not. left) then
 					dimensionSizes = (/spatialDimSize, 1/)
 				else
@@ -444,13 +439,9 @@ module outputhandler
 				allocate(putData(gridW, gridH, otherDim))
 			end if
 			
-			write (*,*) 'Shape of meshData:', shape(meshData)
-                        write (*,*) 'Shape of putData:', shape(putData)
 
-			
 			if (tooBig) then
 				do i=1, otherDim
-                                        call cpu_time(start)
 					if (.not. left) then
 					ierr = nf90_get_var(ncid2, desiredVarID, meshData(:,:), (/1, i/), (/dimensionSizes(1), 1/))
 					if (ierr /= NF90_NOERR) then
@@ -468,7 +459,6 @@ module outputhandler
 					end do
 						
 					else
-                                                call cpu_time(startB)
 						ierr = nf90_get_var(ncid2, desiredVarID, meshData, (/i, 1/), (/1, spatialDimSize/))
 						if (ierr /= NF90_NOERR) then
 							write(0,*) '*********************************************************************************'
@@ -477,17 +467,12 @@ module outputhandler
 							write(0,*) '*********************************************************************************'
 							stop
 						end if
-					        call cpu_time(finishB)
-                                                write (*,*) 'Timer B:', finishB - startB                 
 						do j=1, gridW
 							do k=1, gridH
 								putData(j,k,1) = meshData(1, grid(j, k, spatialDim))
 							end do
 						end do
-                                                call cpu_time(finishC)
-                                                write (*,*) 'Timer C:', finishC - finishB        
 					end if
-                                        call cpu_time(startB)
 					ierr = nf90_put_var(ncidNew, gridVarID, putData(:,:,1), (/1, 1, i/), count=(/gridW, gridH, 1/))
 					if (ierr /= NF90_NOERR) then
 						write(0,*) '*********************************************************************************'
@@ -502,9 +487,6 @@ module outputhandler
 						write(0,*) '*********************************************************************************'
 					end if
                                         
-                                        call cpu_time(finish)
-                                        write (*,*) 'Timer Put:', finish - startB       
-                                        write (*,*) 'timer A:', finish - start
 				end do
 				
 			else !If not too big
