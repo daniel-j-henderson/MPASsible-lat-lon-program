@@ -328,86 +328,212 @@ module outputhandler
 		implicit none
 			integer, intent(in) :: desiredVarID, gridVarID
 			integer, dimension(2), intent(in) :: varDimIDs
-			integer :: spatialDim, otherDim, j, k
+			integer :: spatialDim, i, j, k, spatialDimSize, otherDim                      
 			real, dimension(:,:,:), allocatable :: putData
 			real, dimension(:,:), allocatable :: meshData
-
+			logical :: tooBig = .false., left = .false.
+     	    integer(kind=8) :: bigness, x, y
+     	    integer, dimension(2) :: dimensionSizes
+                        real(kind=8) :: start, finish, startB, startC, finishB, finishC     
+     	    
+     	    
 			if ((varDimIDs(1) == nCellsID) .or. (varDimIDs(2) == nCellsID)) then
 					spatialDim = 3
+					spatialDimSize = nCells
 					if ((varDimIDs(2) == TimeID) .or. (varDimIDs(1) == TimeID)) then
 						otherDim = elapsedTime
-						allocate(meshData(nCells, elapsedTime))
-						allocate(putData(gridW, gridH, elapsedTime))
+						if (varDimIDs(1) == TimeID) then
+							left = .true.
+						end if
 					!case(nvlID)
 					else if ((varDimIDs(2) == nvlID) .or. (varDimIDs(1) == nvlID)) then
 						otherDim = nVertLevels
-						allocate(meshData(nCells, nVertLevels))
-						allocate(putData(gridW, gridH, nVertLevels))
+						if (varDimIDs(1) == nvlID) then
+							left = .true.
+						end if
 					!case(nslID)
 					else if ((varDimIDs(2) == nslID) .or. (varDimIDs(1) == nslID)) then
 						otherDim = nSoilLevels
-						allocate(meshData(nCells, nSoilLevels))
-						allocate(putData(gridW, gridH, nSoilLevels))
+						if (varDimIDs(1) == nslID) then
+							left = .true.
+						end if
 					else
 						print *, 'Invalid dimension of 2-d variable'
 					end if
 			else if ((varDimIDs(1) == nVertID) .or. (varDimIDs(2) == nVertID)) then
-
+					spatialDimSize = nVertices
 					spatialDim = 4
 					if ((varDimIDs(2) == TimeID) .or. (varDimIDs(1) == TimeID)) then
 						otherDim = elapsedTime
-						allocate(meshData(nVertices, elapsedTime))
-						allocate(putData(gridW, gridH, elapsedTime))
+						if (varDimIDs(1) == nslID) then
+							left = .true.
+						end if
+						
 					!case(nvlID)
 					else if ((varDimIDs(2) == nvlID) .or. (varDimIDs(1) == nvlID)) then
 						otherDim = nVertLevels
-						allocate(meshData(nVertices, nVertLevels))
-						allocate(putData(gridW, gridH, nVertLevels))
+						if (varDimIDs(1) == nvlID) then
+							left = .true.
+						end if
+						
 					!case(nslID)
 					else if ((varDimIDs(2) == nslID) .or. (varDimIDs(1) == nslID)) then
 						otherDim = nSoilLevels
-						allocate(meshData(nVertices, nSoilLevels))
-						allocate(putData(gridW, gridH, nSoilLevels))
+						if (varDimIDs(1) == nslID) then
+							left = .true.
+						end if
+						
 					else
 						print *, 'Invalid dimension of 2-d variable'
 					end if
 			else if ((varDimIDs(1) == nEdgesID) .or. (varDimIDs(2) == nEdgesID)) then
 					spatialDim = 5
+					spatialDimSize = nEdges
 					if ((varDimIDs(2) == TimeID) .or. (varDimIDs(1) == TimeID)) then
 						otherDim = elapsedTime
-						allocate(meshData(nEdges, elapsedTime))
-						allocate(putData(gridW, gridH, elapsedTime))
+						if (varDimIDs(1) == nslID) then
+							left = .true.
+						end if
+						
 					!case(nvlID)
 					else if ((varDimIDs(2) == nvlID) .or. (varDimIDs(1) == nvlID)) then
 						otherDim = nVertLevels
-						allocate(meshData(nEdges, nVertLevels))
-						allocate(putData(gridW, gridH, nVertLevels))
+						if (varDimIDs(1) == nvlID) then
+							left = .true.
+						end if
 					!case(nslID)
 					else if ((varDimIDs(2) == nslID) .or. (varDimIDs(1) == nslID)) then
 						otherDim = nSoilLevels
-						allocate(meshData(nEdges, nSoilLevels))
-						allocate(putData(gridW, gridH, nSoilLevels))
+						if (varDimIDs(1) == nslID) then
+							left = .true.
+						end if
 					else
 						print *, 'Invalid dimension of 2-d variable'
 					end if
 			else 
 				print *, 'No spatial dimension in one of your 2-d variables, could not put any data.'
 			end if
-			ierr = nf90_get_var(ncid2, desiredVarID, meshData(:,:))
-			if (ierr /= NF90_NOERR) then
-				write(0,*) '*********************************************************************************'
-				write(0,*) 'Error getting data from mesh variable with ID', desiredVarID, 'in'//filename
-				write(0,*) 'ierr = ', ierr
-				write(0,*) '*********************************************************************************'
-				stop
+			
+
+			
+			
+			if(left) then
+				dimensionSizes = (/otherDim, spatialDimSize/)
+			else
+				dimensionSizes = (/spatialDimSize, otherDim/)
 			end if
-				
-			do j=1, gridW
-				do k=1, gridH
-					putData(j,k,:) = meshData(grid(j, k, spatialDim),:)
+                        write (*,*) 'spatialDimSize', spatialDimSize
+                        write (*,*) 'otherDim', otherDim
+                        x = spatialDimSize
+                        y = otherDim
+                        bigness = x*y
+                        write (*,*) 'The bigness is :', bigness                    
+			if (bigness > 800000000) then
+				tooBig = .true.
+                                write (*,*) 'tooBig is:', tooBig
+				if (.not. left) then
+					dimensionSizes = (/spatialDimSize, 1/)
+				else
+					dimensionSizes = (/1, spatialDimSize/)
+				end if
+				write (*,*) 'Your data for your 2-d variable is so large that we are going to handle it in 1-d slices.'    
+				allocate(meshData(dimensionSizes(1), dimensionSizes(2)))
+				allocate(putData(gridW, gridH, 1))
+			else
+				allocate(meshData(dimensionSizes(1), dimensionSizes(2)))
+				allocate(putData(gridW, gridH, otherDim))
+			end if
+			
+			write (*,*) 'Shape of meshData:', shape(meshData)
+                        write (*,*) 'Shape of putData:', shape(putData)
+
+			
+			if (tooBig) then
+				do i=1, otherDim
+                                        call cpu_time(start)
+					if (.not. left) then
+					ierr = nf90_get_var(ncid2, desiredVarID, meshData(:,:), (/1, i/), (/dimensionSizes(1), 1/))
+					if (ierr /= NF90_NOERR) then
+						write(0,*) '*********************************************************************************'
+						write(0,*) 'Error getting data from mesh variable with ID', desiredVarID, 'in'//filename
+						write(0,*) 'ierr = ', ierr
+						write(0,*) '*********************************************************************************'
+						stop
+					end if
+					
+					do j=1, gridW
+						do k=1, gridH
+							putData(j,k,1) = meshData(grid(j, k, spatialDim),1)
+						end do
+					end do
+						
+					else
+                                                call cpu_time(startB)
+						ierr = nf90_get_var(ncid2, desiredVarID, meshData, (/i, 1/), (/1, spatialDimSize/))
+						if (ierr /= NF90_NOERR) then
+							write(0,*) '*********************************************************************************'
+							write(0,*) 'Error getting data from mesh variable with ID', desiredVarID, 'in'//filename
+							write(0,*) 'ierr = ', ierr
+							write(0,*) '*********************************************************************************'
+							stop
+						end if
+					        call cpu_time(finishB)
+                                                write (*,*) 'Timer B:', finishB - startB                 
+						do j=1, gridW
+							do k=1, gridH
+								putData(j,k,1) = meshData(1, grid(j, k, spatialDim))
+							end do
+						end do
+                                                call cpu_time(finishC)
+                                                write (*,*) 'Timer C:', finishC - finishB        
+					end if
+                                        call cpu_time(startB)
+					ierr = nf90_put_var(ncidNew, gridVarID, putData(:,:,1), (/1, 1, i/), count=(/gridW, gridH, 1/))
+					if (ierr /= NF90_NOERR) then
+						write(0,*) '*********************************************************************************'
+						write(0,*) 'Error putting grid variable data with grid varID', gridVarID, 'in'//filename
+						write(0,*) 'at slice:', i
+						write(0,*) 'ierr = ', ierr
+						write(0,*) '*********************************************************************************'
+						stop
+					else 
+						write(0,*) '*********************************************************************************'
+						write(0,*) 'Successfully put slice number', i, 'of a 2d variable in '//newFilename
+						write(0,*) '*********************************************************************************'
+					end if
+                                        
+                                        call cpu_time(finish)
+                                        write (*,*) 'Timer Put:', finish - startB       
+                                        write (*,*) 'timer A:', finish - start
 				end do
-			end do
-			ierr = nf90_put_var(ncidNew, gridVarID, putData, count=(/gridW, gridH, otherDim/))
+				
+			else !If not too big
+				ierr = nf90_get_var(ncid2, desiredVarID, meshData(:,:))
+				if (ierr /= NF90_NOERR) then
+					write(0,*) '*********************************************************************************'
+					write(0,*) 'Error getting data from mesh variable with ID', desiredVarID, 'in'//filename
+					write(0,*) 'ierr = ', ierr
+					write(0,*) '*********************************************************************************'
+					stop
+				end if
+				
+				if(.not. left) then
+					do j=1, gridW
+						do k=1, gridH
+							putData(j,k,:) = meshData(grid(j, k, spatialDim), :)
+						end do
+					end do
+				else
+					do j=1, gridW
+						do k=1, gridH
+							putData(j,k,:) = meshData(:, grid(j, k, spatialDim))
+						end do
+					end do
+				end if
+			
+			
+			
+				ierr = nf90_put_var(ncidNew, gridVarID, putData, count=(/gridW, gridH, otherDim/))
 				if (ierr /= NF90_NOERR) then
 					write(0,*) '*********************************************************************************'
 					write(0,*) 'Error putting grid variable data with grid varID', gridVarID, 'in'//filename
@@ -419,6 +545,7 @@ module outputhandler
 					write(0,*) 'Successfully put a 2d variable in '//newFilename
 					write(0,*) '*********************************************************************************'
 				end if	
+                        end if
 			deallocate(meshData)
 			deallocate(putData)
 				
