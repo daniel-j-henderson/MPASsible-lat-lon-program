@@ -11,7 +11,7 @@
 	!of the Info file, but need not contain mesh metadata like cell coordinates and such things.
 	!If all Info and Data can be found in the same file, put one of these fields as the filename, the other as a ' '.
 	
-	meshDataFile = '/glade/scratch/duda/daniel/3km/diag.2012-10-28_00.00.00.nc'
+	!meshDataFile = '/glade/scratch/duda/daniel/3km/diag.2012-10-28_00.00.00.nc'
 	
 	
 	outputfile = 'myNewFile.nc' !Whatever you'd like to call the output file
