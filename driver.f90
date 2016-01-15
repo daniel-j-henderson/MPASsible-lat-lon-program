@@ -134,11 +134,10 @@ program latlondriver
     
     
 	
-	
+	write(*,*) 'Opening Input'
+    call open_input(filename, filename2)
 	write(*,*) 'Running Setup'
     call setup()
-    write(*,*) 'Opening Input'
-    call open_input(filename, filename2)
     write(*,*) 'Checking for existence of variables, throwing out any for which there is no input data.'
     call check_existence(varstemp)
 	write(*,*) 'Interpolating data for variables:', desiredMeshVars

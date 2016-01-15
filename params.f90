@@ -42,7 +42,15 @@ module params
 		gridWmax = gridWmax / r2d
 		latSpacing = (gridHmax - gridHmin) / (gridH - 1)
 		lonSpacing = (gridWmax - gridWmin) / (gridW - 1)
-		radius = 6371229.0
+		
+		ierr = nf90_get_att(ncid, NF90_GLOBAL, 'sphere_radius', radius)
+		if (ierr /= NF90_NOERR) then
+			write(0,*) '*********************************************************************************'
+			write(0,*) 'Error, there is no sphere_radius attribute in your info file'//filename
+			write(0,*) 'ierr = ', ierr
+			write(0,*) '*********************************************************************************'
+			stop
+		end if
 		end subroutine setup
 		
 		function size_of(stringArray)
