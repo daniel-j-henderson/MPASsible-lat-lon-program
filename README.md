@@ -18,7 +18,7 @@ Just run the program to create the new interpolated netCDF file and then view it
 **SPATIAL DIMENSION** - This refers to the dimensions nCells, nEdges, and nVertices. Without one of these, there is nothing to interpolate.
 
 ##HOW TO BUILD
-Just make the makefile and you'll be fine
+Just make the makefile with your preferred compiler as the target (I support ifort or gfortran right now), e.g. 'make gfortran'.
 
 ##HOW TO RUN
 1. Edit the namelist called namelist.input
