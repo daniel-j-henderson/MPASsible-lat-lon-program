@@ -4,7 +4,7 @@ program latlondriver
 	use outputhandler
 	use params
 	use netcdf
-	use grid_rotate
+	use mesh_rotate
 	implicit none
 	
 	

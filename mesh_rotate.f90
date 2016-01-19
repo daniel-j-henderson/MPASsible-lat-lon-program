@@ -1,11 +1,12 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! PROGRAM GRID_ROTATE
+! MODULE MESH_ROTATE
 !
 ! Rotate a mesh on a unit sphere from a reference latitude,longitude point 
-! to a destination latitude,longitude point and optionally rotate the grid 
-! counter-cloclwise around the destination point 
+! to a destination latitude,longitude point and optionally rotate the mesh 
+! counter-cloclwise around the destination point. This simply changes the 
+! values for {x,y,z}{Cell,Vertex,Edge} that create_grid_map will use.
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-module grid_rotate
+module mesh_rotate
 
   use netcdf
   use params
