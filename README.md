@@ -36,6 +36,7 @@ Just make the makefile with your preferred compiler as the target (I support ifo
   - use **-i filename** to supply the meshInfoFile from the command line
   - use **-d filename** to supply the meshDataFile from the command line
   - use **-o filename** to redirect the output file from the command line
+  
 ##REQUIREMENTS
   - This version supports up to 20 variables.
   - This version supports 6 MPAS dimensions: nCells, nVertices, nEdges, Time, nVertLevels, nSoilLevels.
