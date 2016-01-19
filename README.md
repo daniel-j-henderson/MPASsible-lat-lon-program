@@ -41,7 +41,7 @@ Just make the makefile with your preferred compiler as the target (I support ifo
   - This version supports up to 20 variables.
   - This version supports 6 MPAS dimensions: nCells, nVertices, nEdges, Time, nVertLevels, nSoilLevels.
   - MPAS syntax must be used in all input files. 
-  - The each variable must be dimensioned at least by one and only one spatial dimension. 
+  - Each variable must be dimensioned by one and only one spatial dimension. 
 
 ##NOTES
   - For large meshes with large, multidimensional variables, the data for one variable at every time/vertical level may be too large to hold in memory, so these variables will be tackled in slices, one slice per (time)(vertlevel). 
