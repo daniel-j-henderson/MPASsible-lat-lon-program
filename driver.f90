@@ -4,6 +4,7 @@ program latlondriver
 	use outputhandler
 	use params
 	use netcdf
+	use grid_rotate
 	implicit none
 	
 	
@@ -14,11 +15,14 @@ program latlondriver
 	logical :: bothFiles = .false., infoOnly = .false., dataOnly = .false.
 	integer :: l, n
 	character (len = NF90_MAX_NAME), dimension(:), allocatable :: varstemp
+	real :: original_latitude_degrees = 0.0, original_longitude_degrees = 0.0, new_latitude_degrees = 0.0, new_longitude_degrees = 0.0, birdseye_rotation_counter_clockwise_degrees = 0.0
 
 	
 	namelist /interpolator_settings/ Variables, meshInfoFile, meshDataFile, outputfile, gridW, gridH, gridHmin, gridHmax, gridWmin, gridWmax
+	namelist /rotate_settings/ original_latitude_degrees, original_longitude_degrees, new_latitude_degrees, new_longitude_degrees, birdseye_rotation_counter_clockwise_degrees
 	open(41,file='namelist.input') 
     read(41,interpolator_settings)
+    read(41,rotate_settings)
     close(41)
     
     
@@ -138,6 +142,15 @@ program latlondriver
     call open_input(filename, filename2)
 	write(*,*) 'Running Setup'
     call setup()
+    
+    ! if (needs rotated), then call rotate(ncid, MeshX, MeshY, MeshZ, xVertex, yVertex, zVertex, xEdge, yEdge, zEdge, &
+    ! original_latitude_degrees, original_longitude_degrees, new_latitude_degrees, new_longitude_degrees, birdseye_rotation_counter_clockwise_degrees)
+    
+    if (needs_rotated(original_latitude_degrees, original_longitude_degrees, new_latitude_degrees, new_longitude_degrees, birdseye_rotation_counter_clockwise_degrees)) then
+    	call rotate(ncid, MeshX, MeshY, MeshZ, xVertex, yVertex, zVertex, xEdge, yEdge, zEdge, &
+                    original_latitude_degrees, original_longitude_degrees, new_latitude_degrees, new_longitude_degrees, birdseye_rotation_counter_clockwise_degrees)
+    end if
+    
     write(*,*) 'Checking for existence of variables, throwing out any for which there is no input data.'
     call check_existence(varstemp)
 	write(*,*) 'Interpolating data for variables:', desiredMeshVars

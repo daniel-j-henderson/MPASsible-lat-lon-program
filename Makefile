@@ -35,16 +35,19 @@ gfortran:
 
 all: interp
 
-interp: input.o output.o driver.o params.o
-	$(FC) $(LDFLAGS) inputprocessing.o outputhandler.o params.o driver.o -o interp 
+interp: input.o output.o driver.o params.o grid_rotate.o
+	$(FC) $(LDFLAGS) inputprocessing.o grid_rotate.o outputhandler.o params.o driver.o -o interp 
 	
 input.o: inputprocessing.f90 params.o
 	$(FC) $(FFLAGS) -c inputprocessing.f90 $(INCLUDES) $(LIBS)
 
+grid_rotate.o: grid_rotate.f90 params.o
+	$(FC) $(FFLAGS) -c grid_rotate.f90 $(INCLUDES) $(LIBS)
+	
 output.o: outputhandler.f90 params.o
 	$(FC) $(FFLAGS) -c outputhandler.f90 $(INCLUDES) $(LIBS)
 	
-driver.o: driver.f90 params.o
+driver.o: driver.f90 grid_rotate.o params.o 
 	$(FC) $(FFLAGS) -c driver.f90 $(INCLUDES) $(LIBS)
 	
 params.o: params.f90 
