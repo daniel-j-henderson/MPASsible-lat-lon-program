@@ -66,6 +66,22 @@ module inputprocessing
 			write(0,*) '*********************************************************************************'
 			stop
 		end if
+		ierr = nf90_inq_varid(ncid, 'latCell', latsID)
+		if (ierr /= NF90_NOERR) then
+			write(0,*) '*********************************************************************************'
+			write(0,*) 'Error inquiring varID of zCell in '//filename
+			write(0,*) 'ierr = ', ierr
+			write(0,*) '*********************************************************************************'
+			stop
+		end if
+		ierr = nf90_inq_varid(ncid, 'lonCell', lonsID)
+		if (ierr /= NF90_NOERR) then
+			write(0,*) '*********************************************************************************'
+			write(0,*) 'Error inquiring varID of zCell in '//filename
+			write(0,*) 'ierr = ', ierr
+			write(0,*) '*********************************************************************************'
+			stop
+		end if
 		ierr = nf90_inq_varid(ncid, 'nEdgesOnCell', nCoCID)
 		if (ierr /= NF90_NOERR) then
 			write(0,*) '*********************************************************************************'
@@ -314,7 +330,23 @@ module inputprocessing
 			write(0,*) '*********************************************************************************'
 			stop
 		end if
-		
+		allocate(latCell(nCells), lonCell(nCells))
+		ierr = nf90_get_var(ncid, latsID, latCell, count = (/nCells/))
+		if (ierr /= NF90_NOERR) then
+			write(0,*) '*********************************************************************************'
+			write(0,*) 'Error getting variable zCell in '//filename
+			write(0,*) 'ierr = ', ierr
+			write(0,*) '*********************************************************************************'
+			stop
+		end if
+		ierr = nf90_get_var(ncid, lonsID, lonCell, count = (/nCells/))
+		if (ierr /= NF90_NOERR) then
+			write(0,*) '*********************************************************************************'
+			write(0,*) 'Error getting variable zCell in '//filename
+			write(0,*) 'ierr = ', ierr
+			write(0,*) '*********************************************************************************'
+			stop
+		end if
 		allocate(nCellsOnCell(nCells))
 		ierr = nf90_get_var(ncid, nCoCID, nCellsOnCell, count = (/nCells/))
 		if (ierr /= NF90_NOERR) then
@@ -504,9 +536,10 @@ module inputprocessing
 		
 
 		
-	subroutine create_grid_map(grid)
+	subroutine create_grid_map(grid, rotated)
 		implicit none
 		real, dimension(:,:,:), allocatable, intent(out) :: grid
+		logical, intent(in) :: rotated
                 real :: start, finish
 		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -543,7 +576,10 @@ module inputprocessing
 				
 				end do
 				grid(i,j,3) = cellmin
-			
+				if (rotated) then
+					grid(i,j,1) = lonCell(cellmin)
+					grid(i,j,2) = latCell(cellmin)
+				end if
 				! Create grid map for nearest Mesh Vertex. Used for vertex-based fields
 				d = sqrt((xVertex(verticesOnCell(1, cellmin)) - x_search)**2.0 + (yVertex(verticesOnCell(1, cellmin)) - y_search)**2.0 + (zVertex(verticesOnCell(1, cellmin)) - z_search)**2.0)
 				nearestVert = verticesOnCell(1, cellmin)
