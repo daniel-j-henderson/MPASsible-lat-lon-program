@@ -1,7 +1,7 @@
 # MPASsible-lat-lon-program
 This program does the MPASsible - now you can view your MPAS output on a lat-lon grid instantly! 
 Just run the program to create the new interpolated netCDF file and then view it in ncview.
-
+In this feature branch, the variables are put in place to allow ncview to draw map outlines.
 
 ##DEFINITIONS
 **MESH** - The term Mesh will generally refer to the MPAS SCVT mesh on which our data is found.
