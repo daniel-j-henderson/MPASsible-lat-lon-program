@@ -36,7 +36,7 @@ gfortran:
 all: interp
 
 interp: input.o output.o driver.o params.o mesh_rotate.o
-	$(FC) $(LDFLAGS) inputprocessing.o mesh_rotate.o outputhandler.o params.o driver.o -o interp 
+	$(FC) $(LDFLAGS) inputprocessing.o mesh_rotate.o outputhandler.o params.o driver.o -o interp $(INCLUDES) $(LIBS)
 	
 input.o: inputprocessing.f90 params.o
 	$(FC) $(FFLAGS) -c inputprocessing.f90 $(INCLUDES) $(LIBS)

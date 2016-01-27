@@ -12,11 +12,10 @@ program latlondriver
 	character(len=100) :: meshInfoFile = ' ', meshDataFile = ' ', outputfile = 'latlon.output.nc'
 	character(len=600) :: commandarg
 	character(len=NF90_MAX_NAME) :: var = ' '
-	logical :: bothFiles = .false., infoOnly = .false., dataOnly = .false.
+	logical :: bothFiles = .false., infoOnly = .false., dataOnly = .false., rotated = .false.
 	integer :: l, n
 	character (len = NF90_MAX_NAME), dimension(:), allocatable :: varstemp
 	real :: original_latitude_degrees = 0.0, original_longitude_degrees = 0.0, new_latitude_degrees = 0.0, new_longitude_degrees = 0.0, birdseye_rotation_counter_clockwise_degrees = 0.0
-
 	
 	namelist /interpolator_settings/ Variables, meshInfoFile, meshDataFile, outputfile, gridW, gridH, gridHmin, gridHmax, gridWmin, gridWmax
 	namelist /rotate_settings/ original_latitude_degrees, original_longitude_degrees, new_latitude_degrees, new_longitude_degrees, birdseye_rotation_counter_clockwise_degrees
@@ -143,19 +142,21 @@ program latlondriver
 	write(*,*) 'Running Setup'
     call setup()
     
+
     ! if (needs rotated), then call rotate(ncid, MeshX, MeshY, MeshZ, xVertex, yVertex, zVertex, xEdge, yEdge, zEdge, &
     ! original_latitude_degrees, original_longitude_degrees, new_latitude_degrees, new_longitude_degrees, birdseye_rotation_counter_clockwise_degrees)
     
     if (needs_rotated(original_latitude_degrees, original_longitude_degrees, new_latitude_degrees, new_longitude_degrees, birdseye_rotation_counter_clockwise_degrees)) then
     	call rotate(ncid, MeshX, MeshY, MeshZ, xVertex, yVertex, zVertex, xEdge, yEdge, zEdge, &
                     original_latitude_degrees, original_longitude_degrees, new_latitude_degrees, new_longitude_degrees, birdseye_rotation_counter_clockwise_degrees)
+        rotated = .true.
     end if
     
     write(*,*) 'Checking for existence of variables, throwing out any for which there is no input data.'
     call check_existence(varstemp)
 	write(*,*) 'Interpolating data for variables:', desiredMeshVars
     write(*,*) 'Creating Grid Map'
-    call create_grid_map(grid)
+    call create_grid_map(grid, rotated)
     write(*,*) 'Creating Output File'
     call create_output_file(newFilename)
     
@@ -174,6 +175,8 @@ program latlondriver
 			call put_data3(meshVarIDs(i), meshDimIDs(i,:), gridVarIDs(i))
     	end if
     end do
+    
+    call put_latlons(grid(:,:,1), grid(:,:,2))
     
 	write(*,*) 'Cleaning Up'
     call clean_up()

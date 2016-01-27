@@ -146,9 +146,54 @@ module outputhandler
 			   write(0,*) '*********************************************************************************'
 			   stop
 			end if
+			
+			ierr = nf90_put_att(ncidNew, gridVarIDs(i), 'coordinates', 'gridLons gridLats')
+			if (ierr /= NF90_NOERR) then
+				write(0,*) '*********************************************************************************'
+				write(0,*) 'Error putting new attribute in'//newFilename
+				write(0,*) 'ierr = ', ierr
+				write(0,*) '*********************************************************************************'
+				stop
+			end if 
 		
 		end do
+		
+		ierr = nf90_def_var(ncidNew, 'gridLons', NF90_REAL, (/xdimID, ydimID/), gridVarIDs(nMeshVars + 1))
+		if (ierr /= NF90_NOERR) then
+		   write(0,*) '*********************************************************************************'
+		   write(0,*) 'Error defining variable gridLats in file '//newFilename
+		   write(0,*) 'ierr = ', ierr
+		   write(0,*) '*********************************************************************************'
+		   stop
+		end if
+		
+		ierr = nf90_def_var(ncidNew, 'gridLats', NF90_REAL, (/xdimID, ydimID/), gridVarIDs(nMeshVars + 2))
+		if (ierr /= NF90_NOERR) then
+		   write(0,*) '*********************************************************************************'
+		   write(0,*) 'Error defining variable gridLats in file '//newFilename
+		   write(0,*) 'ierr = ', ierr
+		   write(0,*) '*********************************************************************************'
+		   stop
+		end if
 	
+		ierr = nf90_put_att(ncidNew, gridVarIDs(nMeshVars+1), 'units', 'degree_north')
+		if (ierr /= NF90_NOERR) then
+			write(0,*) '*********************************************************************************'
+			write(0,*) 'Error putting new attribute in'//newFilename
+			write(0,*) 'ierr = ', ierr
+			write(0,*) '*********************************************************************************'
+			stop
+		end if 
+			
+		ierr = nf90_put_att(ncidNew, gridVarIDs(nMeshVars+2), 'units', 'degree_east')
+		if (ierr /= NF90_NOERR) then
+			write(0,*) '*********************************************************************************'
+			write(0,*) 'Error putting new attribute in'//newFilename
+			write(0,*) 'ierr = ', ierr
+			write(0,*) '*********************************************************************************'
+			stop
+		end if
+			
 		ierr = nf90_enddef(ncidNew)
 		if (ierr /= NF90_NOERR) then
 		   write(0,*) '*********************************************************************************'
@@ -761,7 +806,36 @@ module outputhandler
  	end subroutine put_data3
  
  
-	
+	subroutine put_latlons(lons, lats)
+		implicit none
+		real, dimension(gridW, gridH), intent(in) :: lats, lons
+		
+		
+		
+		
+		ierr = nf90_put_var(ncidNew, gridVarIDs(nMeshVars+2), lats*r2d)
+			if (ierr /= NF90_NOERR) then
+				write(0,*) '*********************************************************************************'
+				write(0,*) 'Error putting grid lats in'//newFilename
+				write(0,*) 'ierr = ', ierr
+				write(0,*) '*********************************************************************************'
+				stop
+			end if 
+		
+			
+			
+		ierr = nf90_put_var(ncidNew, gridVarIDs(nMeshVars+1), lons*r2d)
+			if (ierr /= NF90_NOERR) then
+				write(0,*) '*********************************************************************************'
+				write(0,*) 'Error putting grid lons in'//newFilename
+				write(0,*) 'ierr = ', ierr
+				write(0,*) '*********************************************************************************'
+				stop
+			end if 
+		
+		
+		
+	end subroutine put_latlons
 	
 	
 	subroutine clean_up()
