@@ -163,7 +163,7 @@ program latlondriver
     
 	write(*,*) 'Determining Dimensionality'
     call dimensionality(desiredMeshVars)
-
+    write(*,*) 'Putting data into file'
 	!For each desired mesh variable, based on its dimension call the appropriate routine
 	!to put the data in the output file
 	do i = 1, nMeshVars

@@ -9,14 +9,14 @@ module params
 
 		integer :: i, j, k, moved
 		integer, parameter :: MAX_VARIABLES = 20 !Max number of desired variables you can look at at one time
-		integer, parameter :: NUM_VALID_MPAS_DIMS = 6, MAX_MPAS_DIMENSION = 3 !Number of supported MPAS dimensions and maximum number of dimensions per variable
+		integer, parameter :: NUM_VALID_MPAS_DIMS = 7, MAX_MPAS_DIMENSION = 3 !Number of supported MPAS dimensions and maximum number of dimensions per variable
 		integer :: ierr       ! Return error code from NetCDF calls
 		integer :: ncid, ncidNew, ncid2      ! Handle to the NetCDF files
 		integer :: xID, yID, zID, nCoCID, CoCID, cellmin, terID, nCellsID, maxEdgesID, tdimID, xdimID, ydimID, TimeID, VoCID, nVertID, lonsID, latsID     ! ID of the variables needed
-		integer :: xVertID, yVertID, zVertID, nEdgesID, xEdgeID, yEdgeID, zEdgeID, EoVID, nslID, nvlID
-		integer, dimension(5) :: gridDimIDs !x, y, t, vert, soil
-		integer, dimension(6) :: meshDimIDRef, dimSizes !cells, vertices, edges, time, vert, soil
-		integer :: nCells, maxEdges, nearestOne, nearestVert, elapsedTime, nMeshVars, secondEntry, nVertices, nEdges, nearestEdge, nVertLevels = 0, nSoilLevels = 0
+		integer :: xVertID, yVertID, zVertID, nEdgesID, xEdgeID, yEdgeID, zEdgeID, EoVID, nslID, nvlID, nvlP1ID
+		integer, dimension(NUM_VALID_MPAS_DIMS-1) :: gridDimIDs !x, y, t, vert, soil, vertP1
+		integer, dimension(NUM_VALID_MPAS_DIMS) :: meshDimIDRef, dimSizes !cells, vertices, edges, time, vert, soil, vertP1
+		integer :: nCells, maxEdges, nearestOne, nearestVert, elapsedTime, nMeshVars, secondEntry, nVertices, nEdges, nearestEdge, nVertLevels = 0, nSoilLevels = 0, nVertLevelsP1 = 0
 		character (len = NF90_MAX_NAME), dimension(:), allocatable :: desiredMeshVars !Array of variable names
 	
 		integer, dimension(:), allocatable :: nCellsOnCell, gridVarIDs, meshVarIDs, nDims, meshVarType !Mesh Parameters to be extracted

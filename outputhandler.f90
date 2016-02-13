@@ -7,7 +7,7 @@ module outputhandler
 
 	
 	public
-	integer :: nvertlID, nsoillID
+	integer :: nvertlID, nsoillID, nvertlP1ID
 	contains
 		
 	subroutine create_output_file(newFilename)
@@ -51,6 +51,15 @@ module outputhandler
 		   stop
 		end if
 
+        ierr = nf90_def_dim(ncidNew, 'nVertLevelsP1', nVertLevelsP1, nvertlP1ID)
+        if (ierr /= NF90_NOERR) then
+           write(0,*) '*********************************************************************************'
+           write(0,*) 'Error defining dimension timeDim of unlimited length in file '//newFilename
+           write(0,*) 'ierr = ', ierr
+           write(0,*) '*********************************************************************************'
+           stop
+        end if
+
 		ierr = nf90_def_dim(ncidNew, 'xDim', gridW, xdimID)
 		if (ierr /= NF90_NOERR) then
 		   write(0,*) '*********************************************************************************'
@@ -69,8 +78,7 @@ module outputhandler
 		   stop
 		end if
 	
-	
-		gridDimIDs = (/xdimID, ydimID, tdimID, nvertlID, nsoillID/) !reference of all the dimIDs we just created. Will grow as more dimensions become supported
+		gridDimIDs = (/xdimID, ydimID, tdimID, nvertlID, nsoillID, nvertlP1ID/) !reference of all the dimIDs we just created. Will grow as more dimensions become supported
 	end subroutine create_output_file
 	
 	
@@ -401,6 +409,11 @@ module outputhandler
 						if (varDimIDs(1) == nslID) then
 							left = .true.
 						end if
+                    else if ((varDimIDs(2) == nvlP1ID) .or. (varDimIDs(1) == nvlP1ID)) then
+                        otherDim = nVertLevelsP1
+                        if (varDimIDs(1) == nvlP1ID) then
+                            left = .true.
+                        end if
 					else
 						print *, 'Invalid dimension of 2-d variable'
 					end if
@@ -409,7 +422,7 @@ module outputhandler
 					spatialDim = 4
 					if ((varDimIDs(2) == TimeID) .or. (varDimIDs(1) == TimeID)) then
 						otherDim = elapsedTime
-						if (varDimIDs(1) == nslID) then
+						if (varDimIDs(1) == TimeID) then
 							left = .true.
 						end if
 						
@@ -427,6 +440,11 @@ module outputhandler
 							left = .true.
 						end if
 						
+                    else if ((varDimIDs(2) == nvlP1ID) .or. (varDimIDs(1) == nvlP1ID)) then
+                        otherDim = nVertLevelsP1
+                        if (varDimIDs(1) == nvlP1ID) then
+                            left = .true.
+                        end if
 					else
 						print *, 'Invalid dimension of 2-d variable'
 					end if
@@ -435,7 +453,7 @@ module outputhandler
 					spatialDimSize = nEdges
 					if ((varDimIDs(2) == TimeID) .or. (varDimIDs(1) == TimeID)) then
 						otherDim = elapsedTime
-						if (varDimIDs(1) == nslID) then
+						if (varDimIDs(1) == TimeID) then
 							left = .true.
 						end if
 						
@@ -451,7 +469,14 @@ module outputhandler
 						if (varDimIDs(1) == nslID) then
 							left = .true.
 						end if
-					else
+					
+                    !case(nvlP1ID)
+                    else if ((varDimIDs(2) == nvlP1ID) .or. (varDimIDs(1) == nvlP1ID)) then
+                        otherDim = nVertLevelsP1
+                        if (varDimIDs(1) == nvlP1ID) then
+                            left = .true.
+                        end if
+                    else
 						print *, 'Invalid dimension of 2-d variable'
 					end if
 			else 

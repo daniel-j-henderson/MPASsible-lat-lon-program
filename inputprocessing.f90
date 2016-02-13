@@ -192,6 +192,13 @@ module inputprocessing
 			write(0,*) 'ierr = ', ierr
 			write(0,*) '*********************************************************************************'
 		end if
+        ierr = nf90_inq_dimid(ncid, 'nVertLevelsP1', nvlP1ID)
+        if (ierr /= NF90_NOERR) then
+            write(0,*) '*********************************************************************************'
+            write(0,*) 'Error inquiring nVertLevelsP1 dimid in'//filename
+            write(0,*) 'ierr = ', ierr
+            write(0,*) '*********************************************************************************'
+        end if
 		
 		ierr = nf90_inq_dimid(ncid, 'maxEdges', maxEdgesID)
 		if (ierr /= NF90_NOERR) then
@@ -256,7 +263,13 @@ module inputprocessing
 			write(0,*) 'ierr = ', ierr
 			write(0,*) '*********************************************************************************'
 		end if
-		
+		ierr = nf90_inquire_dimension(ncid, nvlP1ID, len=nVertLevelsP1)
+        if (ierr /= NF90_NOERR) then
+            write(0,*) '*********************************************************************************'
+            write(0,*) 'Error inquiring dimension nSoilLevels in '//filename
+            write(0,*) 'ierr = ', ierr
+            write(0,*) '*********************************************************************************'
+        end if
 		ierr = nf90_inquire_dimension(ncid, maxEdgesID, len=maxEdges)
 		if (ierr /= NF90_NOERR) then
 			write(0,*) '*********************************************************************************'
@@ -506,6 +519,18 @@ module inputprocessing
 			nvlID = l
 		end if
 		
+        ierr = nf90_inq_dimid(ncid2, 'nVertLevelsP1', l)
+        if (ierr /= NF90_NOERR) then
+            
+            write(0,*)'*********************************************************************************'
+            write(0,*) 'Non-fatal error inquiring nVertLevelsP1 dimid in'//filename2
+            write(0,*) 'ierr = ', ierr
+            write(0,*)'*********************************************************************************'
+            
+        else
+            nvlP1ID = l
+        end if
+
 		ierr = nf90_inq_dimid(ncid2, 'nSoilLevels', l)
 		if (ierr /= NF90_NOERR) then
 			write(0,*) '*********************************************************************************'
@@ -519,17 +544,12 @@ module inputprocessing
 		
 		
 		
-		meshDimIDRef = (/nCellsID, nVertID, nEdgesID, TimeID, nvlID, nslID/)
-		dimSizes = (/nCells, nVertices, nEdges, elapsedTime, nVertLevels, nSoilLevels/)
-		
+		meshDimIDRef = (/nCellsID, nVertID, nEdgesID, TimeID, nvlID, nslID, nvlP1ID/)
+		dimSizes = (/nCells, nVertices, nEdges, elapsedTime, nVertLevels, nSoilLevels, nVertLevelsP1/)
 	end subroutine open_input
 		
 		
-	!Returns the number of non-blank character strings in the array
 	
-		
-		
-		
 		
 		
 		
