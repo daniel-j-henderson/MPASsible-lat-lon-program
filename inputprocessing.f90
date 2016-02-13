@@ -66,6 +66,22 @@ module inputprocessing
 			write(0,*) '*********************************************************************************'
 			stop
 		end if
+		ierr = nf90_inq_varid(ncid, 'latCell', latsID)
+		if (ierr /= NF90_NOERR) then
+			write(0,*) '*********************************************************************************'
+			write(0,*) 'Error inquiring varID of zCell in '//filename
+			write(0,*) 'ierr = ', ierr
+			write(0,*) '*********************************************************************************'
+			stop
+		end if
+		ierr = nf90_inq_varid(ncid, 'lonCell', lonsID)
+		if (ierr /= NF90_NOERR) then
+			write(0,*) '*********************************************************************************'
+			write(0,*) 'Error inquiring varID of zCell in '//filename
+			write(0,*) 'ierr = ', ierr
+			write(0,*) '*********************************************************************************'
+			stop
+		end if
 		ierr = nf90_inq_varid(ncid, 'nEdgesOnCell', nCoCID)
 		if (ierr /= NF90_NOERR) then
 			write(0,*) '*********************************************************************************'
@@ -176,6 +192,13 @@ module inputprocessing
 			write(0,*) 'ierr = ', ierr
 			write(0,*) '*********************************************************************************'
 		end if
+        ierr = nf90_inq_dimid(ncid, 'nVertLevelsP1', nvlP1ID)
+        if (ierr /= NF90_NOERR) then
+            write(0,*) '*********************************************************************************'
+            write(0,*) 'Error inquiring nVertLevelsP1 dimid in'//filename
+            write(0,*) 'ierr = ', ierr
+            write(0,*) '*********************************************************************************'
+        end if
 		
 		ierr = nf90_inq_dimid(ncid, 'maxEdges', maxEdgesID)
 		if (ierr /= NF90_NOERR) then
@@ -240,7 +263,13 @@ module inputprocessing
 			write(0,*) 'ierr = ', ierr
 			write(0,*) '*********************************************************************************'
 		end if
-		
+		ierr = nf90_inquire_dimension(ncid, nvlP1ID, len=nVertLevelsP1)
+        if (ierr /= NF90_NOERR) then
+            write(0,*) '*********************************************************************************'
+            write(0,*) 'Error inquiring dimension nSoilLevels in '//filename
+            write(0,*) 'ierr = ', ierr
+            write(0,*) '*********************************************************************************'
+        end if
 		ierr = nf90_inquire_dimension(ncid, maxEdgesID, len=maxEdges)
 		if (ierr /= NF90_NOERR) then
 			write(0,*) '*********************************************************************************'
@@ -314,7 +343,23 @@ module inputprocessing
 			write(0,*) '*********************************************************************************'
 			stop
 		end if
-		
+		allocate(latCell(nCells), lonCell(nCells))
+		ierr = nf90_get_var(ncid, latsID, latCell, count = (/nCells/))
+		if (ierr /= NF90_NOERR) then
+			write(0,*) '*********************************************************************************'
+			write(0,*) 'Error getting variable zCell in '//filename
+			write(0,*) 'ierr = ', ierr
+			write(0,*) '*********************************************************************************'
+			stop
+		end if
+		ierr = nf90_get_var(ncid, lonsID, lonCell, count = (/nCells/))
+		if (ierr /= NF90_NOERR) then
+			write(0,*) '*********************************************************************************'
+			write(0,*) 'Error getting variable zCell in '//filename
+			write(0,*) 'ierr = ', ierr
+			write(0,*) '*********************************************************************************'
+			stop
+		end if
 		allocate(nCellsOnCell(nCells))
 		ierr = nf90_get_var(ncid, nCoCID, nCellsOnCell, count = (/nCells/))
 		if (ierr /= NF90_NOERR) then
@@ -474,6 +519,18 @@ module inputprocessing
 			nvlID = l
 		end if
 		
+        ierr = nf90_inq_dimid(ncid2, 'nVertLevelsP1', l)
+        if (ierr /= NF90_NOERR) then
+            
+            write(0,*)'*********************************************************************************'
+            write(0,*) 'Non-fatal error inquiring nVertLevelsP1 dimid in'//filename2
+            write(0,*) 'ierr = ', ierr
+            write(0,*)'*********************************************************************************'
+            
+        else
+            nvlP1ID = l
+        end if
+
 		ierr = nf90_inq_dimid(ncid2, 'nSoilLevels', l)
 		if (ierr /= NF90_NOERR) then
 			write(0,*) '*********************************************************************************'
@@ -487,26 +544,22 @@ module inputprocessing
 		
 		
 		
-		meshDimIDRef = (/nCellsID, nVertID, nEdgesID, TimeID, nvlID, nslID/)
-		dimSizes = (/nCells, nVertices, nEdges, elapsedTime, nVertLevels, nSoilLevels/)
-		
+		meshDimIDRef = (/nCellsID, nVertID, nEdgesID, TimeID, nvlID, nslID, nvlP1ID/)
+		dimSizes = (/nCells, nVertices, nEdges, elapsedTime, nVertLevels, nSoilLevels, nVertLevelsP1/)
 	end subroutine open_input
 		
 		
-	!Returns the number of non-blank character strings in the array
 	
-		
-		
-		
 		
 		
 		
 		
 
 		
-	subroutine create_grid_map(grid)
+	subroutine create_grid_map(grid, rotated)
 		implicit none
 		real, dimension(:,:,:), allocatable, intent(out) :: grid
+		logical, intent(in) :: rotated
                 real :: start, finish
 		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -543,7 +596,10 @@ module inputprocessing
 				
 				end do
 				grid(i,j,3) = cellmin
-			
+				if (rotated) then
+					grid(i,j,1) = lonCell(cellmin)
+					grid(i,j,2) = latCell(cellmin)
+				end if
 				! Create grid map for nearest Mesh Vertex. Used for vertex-based fields
 				d = sqrt((xVertex(verticesOnCell(1, cellmin)) - x_search)**2.0 + (yVertex(verticesOnCell(1, cellmin)) - y_search)**2.0 + (zVertex(verticesOnCell(1, cellmin)) - z_search)**2.0)
 				nearestVert = verticesOnCell(1, cellmin)

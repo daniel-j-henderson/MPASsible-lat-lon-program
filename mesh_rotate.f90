@@ -104,12 +104,8 @@ contains
       real (kind=RKIND) :: bx, by, bz
       real (kind=RKIND) :: cx, cy, cz
 
-
-
-      
       allocate(latCell(1:nCells))
       allocate(lonCell(1:nCells))
-
       
       allocate(latVertex(1:nVertices))
       allocate(lonVertex(1:nVertices))
@@ -121,31 +117,6 @@ contains
 	  pii = 2.*asin(1.0)
       omega = 2.0*pii / 86400.0
 
-      
-
-      ierr = nf90_inq_varid(ncid, "latCell", varid)
-      ierr = nf90_get_var(ncid, varid, latCell, count=(/nCells/))
-
-      ierr = nf90_inq_varid(ncid, "lonCell", varid)
-      ierr = nf90_get_var(ncid, varid, lonCell, count=(/nCells/))
- 
-
-      
-
-      ierr = nf90_inq_varid(ncid, "latVertex", varid)
-      ierr = nf90_get_var(ncid, varid, latVertex, count=(/nVertices/))
-
-      ierr = nf90_inq_varid(ncid, "lonVertex", varid)
-      ierr = nf90_get_var(ncid, varid, lonVertex, count=(/nVertices/))
-
-
-     
-
-      ierr = nf90_inq_varid(ncid, "latEdge", varid)
-      ierr = nf90_get_var(ncid, varid, latEdge, count=(/nEdges/))
-
-      ierr = nf90_inq_varid(ncid, "lonEdge", varid)
-      ierr = nf90_get_var(ncid, varid, lonEdge, count=(/nEdges/))
 
 
 

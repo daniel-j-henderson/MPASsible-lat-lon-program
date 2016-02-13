@@ -36,22 +36,22 @@ gfortran:
 all: interp
 
 interp: input.o output.o driver.o params.o mesh_rotate.o
-	$(FC) $(LDFLAGS) inputprocessing.o mesh_rotate.o outputhandler.o params.o driver.o -o interp 
+	$(FC) $(LDFLAGS) inputprocessing.o mesh_rotate.o outputhandler.o params.o driver.o -o mpasviewer $(LIBS)
 	
 input.o: inputprocessing.f90 params.o
-	$(FC) $(FFLAGS) -c inputprocessing.f90 $(INCLUDES) $(LIBS)
+	$(FC) $(FFLAGS) -c inputprocessing.f90 $(INCLUDES) 
 
 mesh_rotate.o: mesh_rotate.f90 params.o
-	$(FC) $(FFLAGS) -c mesh_rotate.f90 $(INCLUDES) $(LIBS)
+	$(FC) $(FFLAGS) -c mesh_rotate.f90 
 	
 output.o: outputhandler.f90 params.o
-	$(FC) $(FFLAGS) -c outputhandler.f90 $(INCLUDES) $(LIBS)
+	$(FC) $(FFLAGS) -c outputhandler.f90 $(INCLUDES) 
 	
 driver.o: driver.f90 mesh_rotate.o params.o 
-	$(FC) $(FFLAGS) -c driver.f90 $(INCLUDES) $(LIBS)
+	$(FC) $(FFLAGS) -c driver.f90 
 	
 params.o: params.f90 
-	$(FC) $(FFLAGS) -c params.f90 $(INCLUDES) $(LIBS)
+	$(FC) $(FFLAGS) -c params.f90 
 
 clean:
-	rm *.o interp *.mod 
+	rm *.o mpasviewer *.mod 

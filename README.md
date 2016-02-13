@@ -1,7 +1,8 @@
 # MPASsible-lat-lon-program
 This program does the MPASsible - now you can view your MPAS output on a lat-lon grid instantly! 
 Just run the program to create the new interpolated netCDF file and then view it in ncview.
-v0.1
+v0.2
+=======
 
 ##DEFINITIONS
 **MESH** - The term Mesh will generally refer to the MPAS SCVT mesh on which our data is found.
@@ -39,7 +40,7 @@ Just make the makefile with your preferred compiler as the target (I support ifo
   
 ##REQUIREMENTS
   - This version supports up to 20 variables.
-  - This version supports 6 MPAS dimensions: nCells, nVertices, nEdges, Time, nVertLevels, nSoilLevels.
+  - This version supports 7 MPAS dimensions: nCells, nVertices, nEdges, Time, nVertLevels, nSoilLevels, nVertLevelsP1.
   - MPAS syntax must be used in all input files. 
   - Each variable must be dimensioned by one and only one spatial dimension. 
 
@@ -48,3 +49,4 @@ Just make the makefile with your preferred compiler as the target (I support ifo
   - The execution time generally scales more drastically with grid size than mesh size, so for optimal speed (on the order of a few seconds or less), choose a coarser grid (your monitor is only so large anyways). 
   - That being said, a mesh with over 65 million cells does take around 15 seconds to import all the mesh info into memory, so expect some overhead for very fine meshes.
   - For help with rotation settings, read about it in the grid_rotate source code here (https://mpas-dev.github.io/atmosphere/atmosphere_meshes.html)
+  - If you do not rotate, the lat-lon coordinates used to print the country/state outlines in ncview will be a lot better (when you rotate, it just uses the lat lon of the nearest mesh cell, which is less accurate).
