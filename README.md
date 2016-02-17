@@ -32,7 +32,7 @@ Just make the makefile with your preferred compiler as the target (I support ifo
   - you may specify the name of the desired MPAS variables (up to 20)*
 
   *can also be done from the command line
-2. Supply optional command arguments to the executable "interp"
+2. Supply optional command arguments to the executable "mpasviewer"
   - use **-v var1 var2 var3 ...** to add variables from the command line
   - use **-i filename** to supply the meshInfoFile from the command line
   - use **-d filename** to supply the meshDataFile from the command line
